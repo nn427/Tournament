@@ -6,5 +6,6 @@
 		public const string DistributorNotFound = "E00001";
 		public const string StoreNotFound = "E00002";
 		public const string CreateTournamentFailed = "E00003";
+		public const string TournamentNotFound = "E00004";
 	}
 }

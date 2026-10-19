@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,12 @@ namespace TournamentAPI.Controllers
 	public class TournamentController : ControllerBase
 	{
 		private readonly LocalDBContext _dbContext;
+		private readonly IMapper _mapper;
 
-		public TournamentController(LocalDBContext dbContext)
+		public TournamentController(LocalDBContext dbContext, IMapper mapper)
 		{
 			_dbContext = dbContext;
+			_mapper = mapper;
 		}
 
 		[HttpGet("getTournamentOverview")]
@@ -64,7 +67,41 @@ namespace TournamentAPI.Controllers
 			});
 		}
 
-		// POST api/<ValuesController>
+		[HttpGet("getTournament")]
+		public async Task<ObjectResult> Get([FromQuery] string tournamentId)
+		{
+			var query = from t in _dbContext.tournament
+						join f in _dbContext.tournament_format
+						on t.id equals f.tournamentId
+						join s in _dbContext.store
+						on t.storeId equals s.id
+						where t.id == tournamentId
+						select new
+						{
+							Tournament = t,
+							Format = f,
+							StoreName = s.name
+						};
+
+			var data = await query.FirstOrDefaultAsync();
+			if (data == null)
+				return NotFound(new
+				{
+					success = false,
+					errorCode = ErrorCode.TournamentNotFound,
+				});
+
+			var result = _mapper.Map<GetTournamentResponse>((data.Tournament, data.Format));
+			result.StoreName = data.StoreName;
+
+			return Ok(new
+			{
+				success = true,
+				errorCode = ErrorCode.Success,
+				data = result
+			});
+		}
+
 		[HttpPost("createTournament")]
 		public async Task<ObjectResult> Post([FromBody] CreateTournamentRequest request)
 		{

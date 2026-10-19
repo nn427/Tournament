@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TournamentAPI.Models;
+using TournamentAPI.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<LocalDBContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("WebDatabase")));
+builder.Services.AddAutoMapper(typeof(TournamentProfile));
 
 var app = builder.Build();
 

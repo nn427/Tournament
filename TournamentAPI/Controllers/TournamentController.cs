@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using TournamentAPI.Config;
 using TournamentAPI.DTOs;
 using TournamentAPI.Models;
+using TournamentAPI.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,11 +18,13 @@ namespace TournamentAPI.Controllers
 	{
 		private readonly LocalDBContext _dbContext;
 		private readonly IMapper _mapper;
+		private readonly TournamentService _tournamentService;
 
-		public TournamentController(LocalDBContext dbContext, IMapper mapper)
+		public TournamentController(LocalDBContext dbContext, IMapper mapper, TournamentService tournamentService)
 		{
 			_dbContext = dbContext;
 			_mapper = mapper;
+			_tournamentService = tournamentService;
 		}
 
 		[HttpGet("getTournamentOverview")]
@@ -70,29 +73,14 @@ namespace TournamentAPI.Controllers
 		[HttpGet("getTournament")]
 		public async Task<ObjectResult> Get([FromQuery] string tournamentId)
 		{
-			var query = from t in _dbContext.tournament
-						join f in _dbContext.tournament_format
-						on t.id equals f.tournamentId
-						join s in _dbContext.store
-						on t.storeId equals s.id
-						where t.id == tournamentId
-						select new
-						{
-							Tournament = t,
-							Format = f,
-							StoreName = s.name
-						};
+			var result = await _tournamentService.GetTournamentAsync(tournamentId);
 
-			var data = await query.FirstOrDefaultAsync();
-			if (data == null)
+			if (result == null)
 				return NotFound(new
 				{
 					success = false,
 					errorCode = ErrorCode.TournamentNotFound,
 				});
-
-			var result = _mapper.Map<GetTournamentResponse>((data.Tournament, data.Format));
-			result.StoreName = data.StoreName;
 
 			return Ok(new
 			{

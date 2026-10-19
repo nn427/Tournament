@@ -48,9 +48,8 @@ public partial class LocalDBContext : DbContext
             entity.HasIndex(e => e.storeId, "IX_machine_storeId");
 
             entity.Property(e => e.id)
-                .HasMaxLength(36)
-                .IsUnicode(false)
-                .HasDefaultValueSql("(newid())", "DF_machine_id");
+                .HasMaxLength(12)
+                .IsUnicode(false);
             entity.Property(e => e.macAddress)
                 .HasMaxLength(12)
                 .IsUnicode(false);
@@ -93,7 +92,9 @@ public partial class LocalDBContext : DbContext
             entity.Property(e => e.dartType)
                 .HasComment("1->硬靶, 2->軟靶")
                 .HasDefaultValue((byte)1, "DF_tournament_dartType");
-            entity.Property(e => e.displayName).HasMaxLength(50);
+            entity.Property(e => e.displayName)
+                .HasMaxLength(50)
+                .HasDefaultValue("", "DF_tournament_displayName");
             entity.Property(e => e.distributorId)
                 .HasMaxLength(36)
                 .IsUnicode(false);

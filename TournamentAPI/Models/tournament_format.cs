@@ -18,7 +18,7 @@ public partial class tournament_format
 
     public string gameTypes { get; set; } = null!;
 
-    public byte isHandicap { get; set; }
+    public bool isHandicap { get; set; }
 
     /// <summary>
     /// 0-&gt;OIOO, 1-&gt;OIDO, 2-&gt;DIDO...
@@ -28,12 +28,12 @@ public partial class tournament_format
     /// <summary>
     /// 01遊戲的分數
     /// </summary>
-    public byte game01Score { get; set; }
+    public short game01Score { get; set; }
 
     /// <summary>
     /// 01遊戲專屬, true&gt;三鏢更新分數 false&gt;每鏢更新分數
     /// </summary>
-    public byte isProMode { get; set; }
+    public bool isProMode { get; set; }
 
     /// <summary>
     /// 每隊幾個玩家

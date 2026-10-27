@@ -25,6 +25,8 @@ public partial class LocalDBContext : DbContext
 
     public virtual DbSet<tournament_registration> tournament_registration { get; set; }
 
+    public virtual DbSet<users> users { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<distributor>(entity =>
@@ -165,6 +167,38 @@ public partial class LocalDBContext : DbContext
             entity.Property(e => e.tournamentId)
                 .HasMaxLength(36)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<users>(entity =>
+        {
+            entity.HasNoKey();
+
+            entity.Property(e => e.displayId)
+                .HasMaxLength(8)
+                .IsUnicode(false);
+            entity.Property(e => e.email)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.id)
+                .HasMaxLength(36)
+                .IsUnicode(false)
+                .HasDefaultValueSql("(newid())", "DF_users_id");
+            entity.Property(e => e.name)
+                .HasMaxLength(50)
+                .HasDefaultValue("", "DF_users_name");
+            entity.Property(e => e.nation)
+                .HasMaxLength(2)
+                .IsUnicode(false);
+            entity.Property(e => e.nickname)
+                .HasMaxLength(50)
+                .HasDefaultValue("", "DF_users_nickname");
+            entity.Property(e => e.password)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.photoURL)
+                .HasMaxLength(128)
+                .IsUnicode(false)
+                .HasDefaultValue("", "DF_users_photoURL");
         });
 
         OnModelCreatingPartial(modelBuilder);

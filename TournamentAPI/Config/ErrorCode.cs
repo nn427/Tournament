@@ -10,5 +10,7 @@
 		public const string RegistrationAlreadyClosed = "E00005";
 		public const string RegistrationAlreadyFull = "E00006";
 		public const string RegisterFailed = "E00007";
+		public const string CompleteRegistrationFailed = "E00008";
+		public const string IncorrectRegisteredPlayerCount = "E00009";
 	}
 }

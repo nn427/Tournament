@@ -21,5 +21,5 @@ public partial class tournament_registration
     /// <summary>
     /// 參加者是否是透過網頁訪客報名
     /// </summary>
-    public byte isGuest { get; set; }
+    public bool isGuest { get; set; }
 }

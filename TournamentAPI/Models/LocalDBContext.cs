@@ -19,11 +19,19 @@ public partial class LocalDBContext : DbContext
 
     public virtual DbSet<tournament> tournament { get; set; }
 
+    public virtual DbSet<tournament_battle> tournament_battle { get; set; }
+
     public virtual DbSet<tournament_format> tournament_format { get; set; }
 
     public virtual DbSet<tournament_machine> tournament_machine { get; set; }
 
     public virtual DbSet<tournament_registration> tournament_registration { get; set; }
+
+    public virtual DbSet<tournament_sets> tournament_sets { get; set; }
+
+    public virtual DbSet<tournament_team> tournament_team { get; set; }
+
+    public virtual DbSet<tournament_team_member> tournament_team_member { get; set; }
 
     public virtual DbSet<users> users { get; set; }
 
@@ -114,6 +122,55 @@ public partial class LocalDBContext : DbContext
             entity.Property(e => e.tournamentName).HasMaxLength(50);
         });
 
+        modelBuilder.Entity<tournament_battle>(entity =>
+        {
+            entity.HasKey(e => e.id).HasName("PK_tournament_battle_id");
+
+            entity.HasIndex(e => new { e.tournamentId, e.sequence }, "UQ_tournament_battle_tournamentId_sequence").IsUnique();
+
+            entity.Property(e => e.id)
+                .HasMaxLength(36)
+                .IsUnicode(false)
+                .HasComment("battleId");
+            entity.Property(e => e.abandonPlayerId)
+                .HasMaxLength(36)
+                .IsUnicode(false)
+                .HasComment("執行棄賽的玩家id, 與勝負無關, 只要是這場錦標賽的參加者都可以執行棄賽");
+            entity.Property(e => e.awayScore).HasComment("away隊贏的set數");
+            entity.Property(e => e.awayTeamId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.createdAt)
+                .HasPrecision(0)
+                .HasComment("battle建立的UTC時間");
+            entity.Property(e => e.endDate).HasPrecision(0);
+            entity.Property(e => e.homeScore).HasComment("home隊贏的set數");
+            entity.Property(e => e.homeTeamId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.isAbandon).HasComment("是否棄賽");
+            entity.Property(e => e.leftBattleId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.machineId)
+                .HasMaxLength(36)
+                .IsUnicode(false)
+                .HasComment("能進行對戰的唯一機台");
+            entity.Property(e => e.rightBattleId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.round).HasComment("round數從1開始");
+            entity.Property(e => e.roundName).HasMaxLength(50);
+            entity.Property(e => e.startDate).HasPrecision(0);
+            entity.Property(e => e.status).HasComment("0 => 等待中, 1 => 可以允許開打, 2 => 已結束");
+            entity.Property(e => e.tournamentId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.winnerTeamId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<tournament_format>(entity =>
         {
             entity.HasKey(e => e.tournamentId).HasName("PK_tournament_format_tournamentId");
@@ -165,6 +222,71 @@ public partial class LocalDBContext : DbContext
             entity.Property(e => e.teamId)
                 .HasMaxLength(36)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<tournament_sets>(entity =>
+        {
+            entity.HasKey(e => e.id).HasName("PK_tournament_sets_id");
+
+            entity.HasIndex(e => new { e.battleId, e.sequence }, "UQ_tournament_sets_battleId_sequence").IsUnique();
+
+            entity.Property(e => e.id)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.awayWinLeg).HasComment("away隊這個set贏的leg數量");
+            entity.Property(e => e.battleId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.createdAt)
+                .HasPrecision(0)
+                .HasComment("set建立的UTC時間");
+            entity.Property(e => e.endDate).HasPrecision(0);
+            entity.Property(e => e.firstAttackTeamIndex)
+                .HasComment("先攻home/away的index, -1->未決定, 0->home, 1->away")
+                .HasDefaultValue(-1, "DF_tournament_sets_firstAttackTeamIndex");
+            entity.Property(e => e.homeWinLeg).HasComment("home隊這個set贏的leg數量");
+            entity.Property(e => e.startDate).HasPrecision(0);
+            entity.Property(e => e.winnerTeamId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<tournament_team>(entity =>
+        {
+            entity.HasKey(e => e.id).HasName("PK_tournament_team_id");
+
+            entity.HasIndex(e => new { e.tournamentId, e.sequence }, "UQ_tournament_team_tournamentId_sequence").IsUnique();
+
+            entity.Property(e => e.id)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.createdAt).HasPrecision(0);
+            entity.Property(e => e.sequence).HasComment("報名的順序, 和比賽排序無關, 從0開始");
+            entity.Property(e => e.tournamentId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<tournament_team_member>(entity =>
+        {
+            entity.HasKey(e => new { e.tournamentId, e.teamId, e.playerId }).HasName("PK_tournament_team_member_tournamentId_teamId_playerId");
+
+            entity.HasIndex(e => new { e.tournamentId, e.sequence }, "UQ_tournament_team_member_tournamentId_sequence").IsUnique();
+
+            entity.Property(e => e.tournamentId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.teamId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.playerId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.displayName)
+                .HasMaxLength(50)
+                .HasComment("玩家參加比賽顯示的名稱, 可能是玩家報名時的nickname或是網頁報名自己填入的名稱");
+            entity.Property(e => e.isGuest).HasComment("參加者是否是透過網頁訪客報名");
+            entity.Property(e => e.sequence).HasComment("報名順序");
         });
 
         modelBuilder.Entity<users>(entity =>

@@ -41,5 +41,15 @@ namespace TournamentAPI.Services
 
 			return result;
 		}
+
+		public async Task<string[]> GetTournamentMachineList(string tournamentId)
+		{
+			var query = from m in _dbContext.tournament_machine
+						where m.tournamentId == tournamentId
+						orderby m.sequence
+						select m.machineId;
+
+			return await query.ToArrayAsync();
+		}
 	}
 }

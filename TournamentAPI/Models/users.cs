@@ -20,4 +20,6 @@ public partial class users
     public string email { get; set; } = null!;
 
     public string password { get; set; } = null!;
+
+    public DateTime createdAt { get; set; }
 }

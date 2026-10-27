@@ -149,40 +149,41 @@ public partial class LocalDBContext : DbContext
 
         modelBuilder.Entity<tournament_registration>(entity =>
         {
-            entity.HasNoKey();
-
-            entity.HasIndex(e => new { e.tournamentId, e.sequence }, "PK_tournament_registration_tournamentId_sequence").IsUnique();
+            entity.HasKey(e => new { e.tournamentId, e.sequence }).HasName("PK_tournament_registration_tournamentId_sequence");
 
             entity.HasIndex(e => new { e.tournamentId, e.playerId }, "UQ_tournamentId_playerId").IsUnique();
 
+            entity.Property(e => e.tournamentId)
+                .HasMaxLength(36)
+                .IsUnicode(false);
+            entity.Property(e => e.sequence).HasComment("sequence");
             entity.Property(e => e.displayName).HasMaxLength(80);
             entity.Property(e => e.isGuest).HasComment("參加者是否是透過網頁訪客報名");
             entity.Property(e => e.playerId)
                 .HasMaxLength(36)
                 .IsUnicode(false);
-            entity.Property(e => e.sequence).HasComment("sequence");
             entity.Property(e => e.teamId)
-                .HasMaxLength(36)
-                .IsUnicode(false);
-            entity.Property(e => e.tournamentId)
                 .HasMaxLength(36)
                 .IsUnicode(false);
         });
 
         modelBuilder.Entity<users>(entity =>
         {
-            entity.HasNoKey();
+            entity.HasIndex(e => e.email, "IX_users_email").IsUnique();
 
+            entity.Property(e => e.id)
+                .HasMaxLength(36)
+                .IsUnicode(false)
+                .HasDefaultValueSql("(newid())", "DF_users_id");
+            entity.Property(e => e.createdAt)
+                .HasPrecision(0)
+                .HasDefaultValueSql("(sysutcdatetime())", "DF_users_createdAt");
             entity.Property(e => e.displayId)
                 .HasMaxLength(8)
                 .IsUnicode(false);
             entity.Property(e => e.email)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.id)
-                .HasMaxLength(36)
-                .IsUnicode(false)
-                .HasDefaultValueSql("(newid())", "DF_users_id");
             entity.Property(e => e.name)
                 .HasMaxLength(50)
                 .HasDefaultValue("", "DF_users_name");

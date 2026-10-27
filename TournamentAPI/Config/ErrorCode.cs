@@ -8,5 +8,7 @@
 		public const string CreateTournamentFailed = "E00003";
 		public const string TournamentNotFound = "E00004";
 		public const string RegistrationAlreadyClosed = "E00005";
+		public const string RegistrationAlreadyFull = "E00006";
+		public const string RegisterFailed = "E00007";
 	}
 }
